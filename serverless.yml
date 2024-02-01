@@ -182,4 +182,3 @@ resources:
 # mv node_modules/ nodejs/
 # zip -r nodejs-layer.zip nodejs/
 # rm -rf nodejs/
-# none
