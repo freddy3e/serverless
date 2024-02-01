@@ -233,7 +233,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806295643-2024-02-01T16:51:35.643Z/nodejs.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/nodejs.zip"
               },
               "LayerName": "prod-dependencies",
               "CompatibleRuntimes": [
@@ -248,7 +248,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/get-users.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/get-users.zip"
               },
               "Handler": "getUsers/handler.getUsers",
               "Runtime": "nodejs14.x",
@@ -278,7 +278,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/create-users.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/create-users.zip"
               },
               "Handler": "createUsers/handler.createUsers",
               "Runtime": "nodejs14.x",
@@ -308,7 +308,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/update-users.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/update-users.zip"
               },
               "Handler": "updateUsers/handler.updateUsers",
               "Runtime": "nodejs14.x",
@@ -338,7 +338,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/delete-users.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/delete-users.zip"
               },
               "Handler": "deleteUsers/handler.deleteUsers",
               "Runtime": "python3.8",
@@ -368,7 +368,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/signedUrl.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/signedUrl.zip"
               },
               "Handler": "signedUrl/handler.signedS3Url",
               "Runtime": "nodejs14.x",
@@ -398,7 +398,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/thumbGenerator.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/thumbGenerator.zip"
               },
               "Handler": "thumbnail/handler.thumbnailGenerator",
               "Runtime": "nodejs14.x",
@@ -436,16 +436,6 @@
               "CodeSha256": "/KTJYAiuHqexAZANni0DGX31HIWznsoesispfEoi/WU="
             }
           },
-          "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "UpdateDashusersLambdaFunction"
-              },
-              "CodeSha256": "O8sFnNnCZSuAufWY5D7itl11BGSWls7Kzk5ilA49kpo="
-            }
-          },
           "CreateDashusersLambdaVersionO6WpxkhrpOhTHoz9XvGNzlhbYVGX1LhDtV2CnOi0Q": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
@@ -454,6 +444,16 @@
                 "Ref": "CreateDashusersLambdaFunction"
               },
               "CodeSha256": "pKF7ECAsRGj0WOyef4mWMdm/lRsDIDqPn+rgS8r0MqU="
+            }
+          },
+          "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "UpdateDashusersLambdaFunction"
+              },
+              "CodeSha256": "O8sFnNnCZSuAufWY5D7itl11BGSWls7Kzk5ilA49kpo="
             }
           },
           "DeleteDashusersLambdaVersionJtPiwxrMSj1x1dV0cfXdDfv0uIg5j06F2zg2yxXBE": {
@@ -610,7 +610,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z/custom-resources.zip"
+                "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/custom-resources.zip"
               },
               "FunctionName": "crud-serverless-users-dev-custom-resource-existing-s3",
               "Handler": "s3/handler.handler",
@@ -1014,7 +1014,7 @@
               }
             }
           },
-          "ApiGatewayDeployment1706806573477": {
+          "ApiGatewayDeployment1706816527750": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -1307,7 +1307,7 @@
           },
           "BaseLambdaLayerS3Key": {
             "Description": "Current Lambda layer S3Key",
-            "Value": "serverless/crud-serverless-users/dev/1706806295643-2024-02-01T16:51:35.643Z/nodejs.zip",
+            "Value": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/nodejs.zip",
             "Export": {
               "Name": "sls-crud-serverless-users-dev-BaseLambdaLayerS3Key"
             }
@@ -1321,15 +1321,6 @@
               "Name": "sls-crud-serverless-users-dev-GetDashusersLambdaFunctionQualifiedArn"
             }
           },
-          "UpdateDashusersLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc"
-            },
-            "Export": {
-              "Name": "sls-crud-serverless-users-dev-UpdateDashusersLambdaFunctionQualifiedArn"
-            }
-          },
           "CreateDashusersLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
@@ -1337,6 +1328,15 @@
             },
             "Export": {
               "Name": "sls-crud-serverless-users-dev-CreateDashusersLambdaFunctionQualifiedArn"
+            }
+          },
+          "UpdateDashusersLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-users-dev-UpdateDashusersLambdaFunctionQualifiedArn"
             }
           },
           "DeleteDashusersLambdaFunctionQualifiedArn": {
@@ -1498,7 +1498,7 @@
           "patterns": [
             "getUsers/handler.js"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/get-users.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/get-users.zip"
         },
         "events": [
           {
@@ -1527,7 +1527,7 @@
           "patterns": [
             "createUsers/handler.js"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/create-users.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/create-users.zip"
         },
         "events": [
           {
@@ -1558,7 +1558,7 @@
           "patterns": [
             "updateUsers/handler.js"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/update-users.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/update-users.zip"
         },
         "events": [
           {
@@ -1593,7 +1593,7 @@
           "patterns": [
             "deleteUsers/handler.py"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/delete-users.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/delete-users.zip"
         },
         "events": [
           {
@@ -1621,7 +1621,7 @@
           "patterns": [
             "signedUrl/handler.js"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/signedUrl.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/signedUrl.zip"
         },
         "events": [
           {
@@ -1653,7 +1653,7 @@
           "patterns": [
             "thumbnail/handler.js"
           ],
-          "artifact": "/Users/fpanchi/Documents/Cursos/curso-serverless/.serverless/thumbGenerator.zip"
+          "artifact": "/Users/fpanchi/Documents/Cursos/serverless/.serverless/thumbGenerator.zip"
         },
         "events": [
           {
@@ -1762,7 +1762,7 @@
           "./**"
         ],
         "artifactsS3KeyDirname": "serverless/crud-serverless-users/dev/code-artifacts",
-        "artifactDirectoryName": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z"
+        "artifactDirectoryName": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z"
       },
       "custom": {
         "$ref": "$[\"service\"][\"custom\"]"
@@ -1777,9 +1777,8 @@
             "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"BaseLambdaLayer\"][\"Properties\"][\"CompatibleRuntimes\"]"
           },
           "package": {
-            "artifact": "./nodejs.zip"
-          },
-          "artifactAlreadyUploaded": true
+            "artifact": "nodejs.zip"
+          }
         }
       },
       "resources": {
@@ -1793,7 +1792,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/crud-serverless-users/dev/1706806574382-2024-02-01T16:56:14.382Z",
+    "artifactDirectoryName": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z",
     "artifact": ""
   }
 }
