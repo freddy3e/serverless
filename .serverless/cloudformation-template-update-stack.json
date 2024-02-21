@@ -71,6 +71,12 @@
         }
       }
     },
+    "CustomDashauthorizerLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/crud-serverless-users-dev-custom-authorizer"
+      }
+    },
     "GetDashusersLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -105,6 +111,12 @@
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
         "LogGroupName": "/aws/lambda/crud-serverless-users-dev-thumbGenerator"
+      }
+    },
+    "SqsDashqueueWorkerLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/crud-serverless-users-dev-sqs-queueWorker"
       }
     },
     "IamRoleLambdaExecution": {
@@ -178,6 +190,37 @@
                     "s3:*"
                   ],
                   "Resource": "arn:aws:s3:::bucket-serverless-course/*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:SendMessage",
+                    "sqs:ChangeMessageVisibility"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "sqsqueueQueue2D4D9CB5",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "sqsqueueQueue2D4D9CB5",
+                        "Arn"
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -206,31 +249,32 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/nodejs.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708532888217-2024-02-21T16:28:08.217Z/nodejs.zip"
         },
         "LayerName": "prod-dependencies",
         "CompatibleRuntimes": [
-          "nodejs14.x"
+          "nodejs20.x"
         ]
       }
     },
-    "GetDashusersLambdaFunction": {
+    "CustomDashauthorizerLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/get-users.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/custom-authorizer.zip"
         },
-        "Handler": "getUsers/handler.getUsers",
-        "Runtime": "nodejs14.x",
-        "FunctionName": "crud-serverless-users-dev-get-users",
+        "Handler": "authorizer/handler.authorize",
+        "Runtime": "nodejs20.x",
+        "FunctionName": "crud-serverless-users-dev-custom-authorizer",
         "MemorySize": 1024,
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -239,6 +283,42 @@
             "Arn"
           ]
         }
+      },
+      "DependsOn": [
+        "CustomDashauthorizerLogGroup"
+      ]
+    },
+    "GetDashusersLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/get-users.zip"
+        },
+        "Handler": "getUsers/handler.getUsers",
+        "Runtime": "nodejs20.x",
+        "FunctionName": "crud-serverless-users-dev-get-users",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          {
+            "Ref": "BaseLambdaLayer"
+          }
+        ]
       },
       "DependsOn": [
         "GetDashusersLogGroup"
@@ -251,16 +331,17 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/create-users.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/create-users.zip"
         },
         "Handler": "createUsers/handler.createUsers",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "crud-serverless-users-dev-create-users",
         "MemorySize": 1024,
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -268,7 +349,12 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          {
+            "Ref": "BaseLambdaLayer"
+          }
+        ]
       },
       "DependsOn": [
         "CreateDashusersLogGroup"
@@ -281,16 +367,17 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/update-users.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/update-users.zip"
         },
         "Handler": "updateUsers/handler.updateUsers",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "crud-serverless-users-dev-update-users",
         "MemorySize": 1024,
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -311,7 +398,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/delete-users.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/delete-users.zip"
         },
         "Handler": "deleteUsers/handler.deleteUsers",
         "Runtime": "python3.8",
@@ -320,7 +407,8 @@
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -341,16 +429,17 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/signedUrl.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/signedUrl.zip"
         },
         "Handler": "signedUrl/handler.signedS3Url",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "crud-serverless-users-dev-signedUrl",
         "MemorySize": 1024,
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -371,16 +460,17 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/thumbGenerator.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/thumbGenerator.zip"
         },
         "Handler": "thumbnail/handler.thumbnailGenerator",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "crud-serverless-users-dev-thumbGenerator",
         "MemorySize": 1024,
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "BUCKET": "bucket-serverless-course"
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
           }
         },
         "Role": {
@@ -399,37 +489,53 @@
         "ThumbGeneratorLogGroup"
       ]
     },
-    "GetDashusersLambdaVersionQjzCQ5PZosMB4iaBNUhLYyME08MqLh2HoWrdocSEg": {
+    "SqsDashqueueWorkerLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/sqs-queueWorker.zip"
+        },
+        "Handler": "likeuser/handler.likeUser",
+        "Runtime": "nodejs20.x",
+        "FunctionName": "crud-serverless-users-dev-sqs-queueWorker",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "BUCKET": "bucket-serverless-course",
+            "SECRET_EGG": "LmNvbs9YXN0Z"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          {
+            "Ref": "BaseLambdaLayer"
+          }
+        ]
+      },
+      "DependsOn": [
+        "SqsDashqueueWorkerLogGroup"
+      ]
+    },
+    "CustomDashauthorizerLambdaVersion8DHdYO34nQHZFdg2AvbkgHr9PSo4bPHKClFaqLX0Pk": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
-          "Ref": "GetDashusersLambdaFunction"
+          "Ref": "CustomDashauthorizerLambdaFunction"
         },
-        "CodeSha256": "/KTJYAiuHqexAZANni0DGX31HIWznsoesispfEoi/WU="
+        "CodeSha256": "ok8zQZ1hR0tbSKNoxpgZM7LNna2Sj3MBfc1Z4VNjMCc="
       }
     },
-    "CreateDashusersLambdaVersionO6WpxkhrpOhTHoz9XvGNzlhbYVGX1LhDtV2CnOi0Q": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "CreateDashusersLambdaFunction"
-        },
-        "CodeSha256": "pKF7ECAsRGj0WOyef4mWMdm/lRsDIDqPn+rgS8r0MqU="
-      }
-    },
-    "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "UpdateDashusersLambdaFunction"
-        },
-        "CodeSha256": "O8sFnNnCZSuAufWY5D7itl11BGSWls7Kzk5ilA49kpo="
-      }
-    },
-    "DeleteDashusersLambdaVersionJtPiwxrMSj1x1dV0cfXdDfv0uIg5j06F2zg2yxXBE": {
+    "DeleteDashusersLambdaVersionmknDxT9tgKwgnt10GsUXzMME9tTytOwv2mImhvbPfY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -439,7 +545,7 @@
         "CodeSha256": "NG5n5cGrJH01F7siu5F0/7loQBH+vUesawA4vi+AEv0="
       }
     },
-    "SignedUrlLambdaVersionkqkvEnXKbGEj4dhHg0wIxatmlFghENTx0nDrEto1bLM": {
+    "SignedUrlLambdaVersionwRxBa519Je8NcXTa88ICnmQgyRLHxcasORb2CmbV0U": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -449,7 +555,37 @@
         "CodeSha256": "aII/0OqdgVytUxjT3o8x+rfvAfcKbuKamdjkGSMSdUY="
       }
     },
-    "ThumbGeneratorLambdaVersion1gTeNwaLXSJcyvXhpEggnbHsBAy275Prm0WQPH8gYM": {
+    "UpdateDashusersLambdaVersionqxDrkIWBo21hmecr3NfNK3oeo9oHEWzpMG7zxJgnQ": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "UpdateDashusersLambdaFunction"
+        },
+        "CodeSha256": "O8sFnNnCZSuAufWY5D7itl11BGSWls7Kzk5ilA49kpo="
+      }
+    },
+    "GetDashusersLambdaVersionHmgksS7EAcqzsqwqeuKbYh66RmeiTZYQmPo11Y": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetDashusersLambdaFunction"
+        },
+        "CodeSha256": "/KTJYAiuHqexAZANni0DGX31HIWznsoesispfEoi/WU="
+      }
+    },
+    "CreateDashusersLambdaVersioniFSdzpKigCYf1cBsVRCx07lBCPblkahtVacoyhqJeEs": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateDashusersLambdaFunction"
+        },
+        "CodeSha256": "pKF7ECAsRGj0WOyef4mWMdm/lRsDIDqPn+rgS8r0MqU="
+      }
+    },
+    "ThumbGeneratorLambdaVersion4JIXqkmyTh2CHuG5rCTBw5ic01kSqWqbxotvd3hA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -457,6 +593,16 @@
           "Ref": "ThumbGeneratorLambdaFunction"
         },
         "CodeSha256": "K6NBsaaz0GkZNqIUo93ucFtgVXSWbruIBaY2gm8NFME="
+      }
+    },
+    "SqsDashqueueWorkerLambdaVersion9xwAE9kw4z1dOYUjz974D2GpE0D8CT1TJO6iOahrI": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "SqsDashqueueWorkerLambdaFunction"
+        },
+        "CodeSha256": "H3vpNHSSczNx58HW8ahS8mjLu2v6CisEVMjs5+hnktE="
       }
     },
     "ThumbGeneratorCustomS31": {
@@ -583,7 +729,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/custom-resources.zip"
+          "S3Key": "serverless/crud-serverless-users/dev/1708534146554-2024-02-21T16:49:06.554Z/custom-resources.zip"
         },
         "FunctionName": "crud-serverless-users-dev-custom-resource-existing-s3",
         "Handler": "s3/handler.handler",
@@ -987,7 +1133,7 @@
         }
       }
     },
-    "ApiGatewayDeployment1706816527750": {
+    "ApiGatewayDeployment1708534144452": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -1000,8 +1146,54 @@
         "ApiGatewayMethodUsersPost",
         "ApiGatewayMethodUsersIdVarPatch",
         "ApiGatewayMethodUsersIdVarDelete",
-        "ApiGatewayMethodSignedurlGet"
+        "ApiGatewayMethodSignedurlGet",
+        "ApiGatewayMethodLikeuserOptions",
+        "ApiGatewayMethodLikeuserPost"
       ]
+    },
+    "ApiGatewayApiKey1": {
+      "Type": "AWS::ApiGateway::ApiKey",
+      "Properties": {
+        "Enabled": true,
+        "Name": "crud-serverless-user-apikey",
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StageName": "dev"
+          }
+        ]
+      },
+      "DependsOn": "ApiGatewayDeployment1708534144452"
+    },
+    "ApiGatewayUsagePlan": {
+      "Type": "AWS::ApiGateway::UsagePlan",
+      "DependsOn": "ApiGatewayDeployment1708534144452",
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "Stage": "dev"
+          }
+        ],
+        "Description": "Usage plan for crud-serverless-users dev stage",
+        "UsagePlanName": "crud-serverless-users-dev"
+      }
+    },
+    "ApiGatewayUsagePlanKey1": {
+      "Type": "AWS::ApiGateway::UsagePlanKey",
+      "Properties": {
+        "KeyId": {
+          "Ref": "ApiGatewayApiKey1"
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "ApiGatewayUsagePlan"
+        }
+      }
     },
     "GetDashusersLambdaPermissionApiGateway": {
       "Type": "AWS::Lambda::Permission",
@@ -1188,6 +1380,239 @@
         }
       }
     },
+    "SqsDashqueueWorkerEventSourceMappingSQSSqsqueueQueue2D4D9CB5": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "IamRoleLambdaExecution"
+      ],
+      "Properties": {
+        "BatchSize": 1,
+        "MaximumBatchingWindowInSeconds": 0,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "sqsqueueQueue2D4D9CB5",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SqsDashqueueWorkerLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true,
+        "FunctionResponseTypes": [
+          "ReportBatchItemFailures"
+        ]
+      }
+    },
+    "ApiGatewayResourceLikeuser": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "likeuser",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodLikeuserOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceLikeuser"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApigatewayToSqsRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "apigatewaytosqs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:SendMessage"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                        {
+                          "queueName": "likequeue"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ApiGatewayMethodLikeuserPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "AuthorizationType": "NONE",
+        "ApiKeyRequired": false,
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceLikeuser"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS",
+          "Credentials": {
+            "Fn::GetAtt": [
+              "ApigatewayToSqsRole",
+              "Arn"
+            ]
+          },
+          "Uri": {
+            "Fn::Sub": [
+              "arn:${AWS::Partition}:apigateway:${AWS::Region}:sqs:path//${AWS::AccountId}/${queueName}",
+              {
+                "queueName": "likequeue"
+              }
+            ]
+          },
+          "RequestParameters": {
+            "integration.request.querystring.Action": "'SendMessage'",
+            "integration.request.querystring.MessageBody": "method.request.body"
+          },
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": 200,
+              "SelectionPattern": 200,
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "ResponseTemplates": {
+                "application/json": "{ \"message\": \"accepted\" }"
+              }
+            },
+            {
+              "StatusCode": 400,
+              "SelectionPattern": 400,
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "ResponseTemplates": {
+                "application/json": "{ \"message\": \"there is an error in your request\" }"
+              }
+            },
+            {
+              "StatusCode": 500,
+              "SelectionPattern": 500,
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "ResponseTemplates": {
+                "application/json": "{ \"message\": \"there was an error handling your request\" }"
+              }
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "ResponseModels": {},
+            "StatusCode": 200
+          },
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "ResponseModels": {},
+            "StatusCode": 400
+          },
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "ResponseModels": {},
+            "StatusCode": 500
+          }
+        ]
+      }
+    },
     "usersTable": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
@@ -1251,6 +1676,33 @@
           ]
         }
       }
+    },
+    "sqsqueueDlq73C8BFDF": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "MessageRetentionPeriod": 1209600,
+        "QueueName": "crud-serverless-users-dev-sqs-queue-dlq"
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
+    },
+    "sqsqueueQueue2D4D9CB5": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "likequeue",
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "sqsqueueDlq73C8BFDF",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 3
+        },
+        "VisibilityTimeout": 36
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
     }
   },
   "Outputs": {
@@ -1273,49 +1725,31 @@
     },
     "BaseLambdaLayerHash": {
       "Description": "Current Lambda layer hash",
-      "Value": "02a53767c941a221d3adae798a4c59d80c2b52a1",
+      "Value": "4496a6e24cdb22d02b50068f64caa15ded6aff8e",
       "Export": {
         "Name": "sls-crud-serverless-users-dev-BaseLambdaLayerHash"
       }
     },
     "BaseLambdaLayerS3Key": {
       "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/crud-serverless-users/dev/1706816528815-2024-02-01T19:42:08.815Z/nodejs.zip",
+      "Value": "serverless/crud-serverless-users/dev/1708532888217-2024-02-21T16:28:08.217Z/nodejs.zip",
       "Export": {
         "Name": "sls-crud-serverless-users-dev-BaseLambdaLayerS3Key"
       }
     },
-    "GetDashusersLambdaFunctionQualifiedArn": {
+    "CustomDashauthorizerLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetDashusersLambdaVersionQjzCQ5PZosMB4iaBNUhLYyME08MqLh2HoWrdocSEg"
+        "Ref": "CustomDashauthorizerLambdaVersion8DHdYO34nQHZFdg2AvbkgHr9PSo4bPHKClFaqLX0Pk"
       },
       "Export": {
-        "Name": "sls-crud-serverless-users-dev-GetDashusersLambdaFunctionQualifiedArn"
-      }
-    },
-    "CreateDashusersLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "CreateDashusersLambdaVersionO6WpxkhrpOhTHoz9XvGNzlhbYVGX1LhDtV2CnOi0Q"
-      },
-      "Export": {
-        "Name": "sls-crud-serverless-users-dev-CreateDashusersLambdaFunctionQualifiedArn"
-      }
-    },
-    "UpdateDashusersLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "UpdateDashusersLambdaVersiongbCKgCjvLKWhriqwyPPMWFgn8cuFbeITbDFl6Moc"
-      },
-      "Export": {
-        "Name": "sls-crud-serverless-users-dev-UpdateDashusersLambdaFunctionQualifiedArn"
+        "Name": "sls-crud-serverless-users-dev-CustomDashauthorizerLambdaFunctionQualifiedArn"
       }
     },
     "DeleteDashusersLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "DeleteDashusersLambdaVersionJtPiwxrMSj1x1dV0cfXdDfv0uIg5j06F2zg2yxXBE"
+        "Ref": "DeleteDashusersLambdaVersionmknDxT9tgKwgnt10GsUXzMME9tTytOwv2mImhvbPfY"
       },
       "Export": {
         "Name": "sls-crud-serverless-users-dev-DeleteDashusersLambdaFunctionQualifiedArn"
@@ -1324,19 +1758,55 @@
     "SignedUrlLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "SignedUrlLambdaVersionkqkvEnXKbGEj4dhHg0wIxatmlFghENTx0nDrEto1bLM"
+        "Ref": "SignedUrlLambdaVersionwRxBa519Je8NcXTa88ICnmQgyRLHxcasORb2CmbV0U"
       },
       "Export": {
         "Name": "sls-crud-serverless-users-dev-SignedUrlLambdaFunctionQualifiedArn"
       }
     },
+    "UpdateDashusersLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "UpdateDashusersLambdaVersionqxDrkIWBo21hmecr3NfNK3oeo9oHEWzpMG7zxJgnQ"
+      },
+      "Export": {
+        "Name": "sls-crud-serverless-users-dev-UpdateDashusersLambdaFunctionQualifiedArn"
+      }
+    },
+    "GetDashusersLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetDashusersLambdaVersionHmgksS7EAcqzsqwqeuKbYh66RmeiTZYQmPo11Y"
+      },
+      "Export": {
+        "Name": "sls-crud-serverless-users-dev-GetDashusersLambdaFunctionQualifiedArn"
+      }
+    },
+    "CreateDashusersLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CreateDashusersLambdaVersioniFSdzpKigCYf1cBsVRCx07lBCPblkahtVacoyhqJeEs"
+      },
+      "Export": {
+        "Name": "sls-crud-serverless-users-dev-CreateDashusersLambdaFunctionQualifiedArn"
+      }
+    },
     "ThumbGeneratorLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ThumbGeneratorLambdaVersion1gTeNwaLXSJcyvXhpEggnbHsBAy275Prm0WQPH8gYM"
+        "Ref": "ThumbGeneratorLambdaVersion4JIXqkmyTh2CHuG5rCTBw5ic01kSqWqbxotvd3hA"
       },
       "Export": {
         "Name": "sls-crud-serverless-users-dev-ThumbGeneratorLambdaFunctionQualifiedArn"
+      }
+    },
+    "SqsDashqueueWorkerLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "SqsDashqueueWorkerLambdaVersion9xwAE9kw4z1dOYUjz974D2GpE0D8CT1TJO6iOahrI"
+      },
+      "Export": {
+        "Name": "sls-crud-serverless-users-dev-SqsDashqueueWorkerLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
@@ -1363,6 +1833,27 @@
       },
       "Export": {
         "Name": "sls-crud-serverless-users-dev-ServiceEndpoint"
+      }
+    },
+    "sqsqueueQueueArnE88B4375": {
+      "Description": "ARN of the \"sqs-queue\" SQS queue.",
+      "Value": {
+        "Fn::GetAtt": [
+          "sqsqueueQueue2D4D9CB5",
+          "Arn"
+        ]
+      }
+    },
+    "sqsqueueQueueUrl3809BBF1": {
+      "Description": "URL of the \"sqs-queue\" SQS queue.",
+      "Value": {
+        "Ref": "sqsqueueQueue2D4D9CB5"
+      }
+    },
+    "sqsqueueDlqUrl1FF18D38": {
+      "Description": "URL of the \"sqs-queue\" SQS dead letter queue.",
+      "Value": {
+        "Ref": "sqsqueueDlq73C8BFDF"
       }
     }
   }

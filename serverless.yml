@@ -2,7 +2,7 @@ service: crud-serverless-users
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   apiGateway:
     apiKeys:
       - crud-serverless-user-apikey
@@ -22,6 +22,10 @@ provider:
 # plugins:
 #   - serverless-offline
 #   - serverless-dynamodb
+
+plugins:
+  - serverless-apigateway-service-proxy
+  - serverless-lift
 
 package:
   individually: true
@@ -43,6 +47,41 @@ custom:
     # Uncomment only if you already have a DynamoDB running locally
     # noStart: true
 
+  apiGatewayServiceProxies:
+    - sqs:
+        path: /likeuser
+        method: post
+        queueName: likequeue
+        cors: true
+        response:
+          template:
+            # `success` is used when the integration response is 200
+            success: |-
+              { "message": "accepted" }
+             # `clientError` is used when the integration response is 400
+            clientError: |-
+              { "message": "there is an error in your request" }
+             # `serverError` is used when the integration response is 500
+            serverError: |-
+              { "message": "there was an error handling your request" }
+
+constructs:
+    sqs-queue:
+        type: queue
+        batchSize: 1
+        worker:
+            handler: likeuser/handler.likeUser
+            layers:
+              - {Ref: BaseLambdaLayer}
+            # reservedConcurrency: 1
+            package:
+                patterns:
+                    - "likeuser/handler.js"
+        extensions: 
+          queue:
+            Properties:
+              QueueName: likequeue
+            
 functions:
   custom-authorizer:
     handler: authorizer/handler.authorize
@@ -52,12 +91,14 @@ functions:
 
   get-users:
     handler: getUsers/handler.getUsers
+    layers:
+      - {Ref: BaseLambdaLayer}
     package:
       patterns:
         - "getUsers/handler.js"
     events:
       - http:
-          private: true
+          # private: true
           path: users/{id}
           method: GET
           request:
@@ -67,15 +108,17 @@ functions:
 
   create-users:
     handler: createUsers/handler.createUsers
+    layers:
+      - {Ref: BaseLambdaLayer}
     package:
       patterns:
         - "createUsers/handler.js"
     events:
       - http:
           path: users
-          authorizer: 
-            name: custom-authorizer
-            resultTtlInSeconds: 15
+          # authorizer: 
+          #   name: custom-authorizer
+          #   resultTtlInSeconds: 15
           method: POST
           request:
             schemas:
@@ -145,7 +188,7 @@ layers:
   base:
     name: "prod-dependencies"
     compatibleRuntimes:
-      - "nodejs14.x"
+      - "nodejs20.x"
     package:
       artifact: app/nodejs.zip
 
@@ -196,3 +239,4 @@ resources:
 # mv node_modules/ nodejs/
 # zip -r nodejs-layer.zip nodejs/
 # rm -rf nodejs/
+# export NODE_TLS_REJECT_UNAUTHORIZED=0
